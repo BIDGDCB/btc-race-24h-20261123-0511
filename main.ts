@@ -94,6 +94,10 @@ await runBars({
     // Flat: look for a momentum entry.
     if (closes.length < 6) return [];
     if (state.seq - lastExitSeq < COOLDOWN_BARS) return [];
+    // No new entries in the last hour of the window: a position opened there
+    // has almost no time to run before the final flatten, yet still pays the
+    // full ~26 bps round trip in fees, slippage and impact.
+    if (closes.length > 1380) return [];
     const retBps = ((close - closes[closes.length - 6]) / closes[closes.length - 6]) * 10000;
     const aboveTrend = ema50 !== null && close > ema50;
     if (retBps < ENTRY_BPS || !aboveTrend) return [];
